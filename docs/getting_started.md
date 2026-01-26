@@ -95,6 +95,14 @@ OPENAI_API_KEY=sk-proj-your-key-here
 ANTHROPIC_API_KEY=your-anthropic-key-here  # Optional
 ```
 
+To use OpenRouter keys, set the following variable
+```bash
+# .env file
+OPENROUTER_API_KEY="your-openrouter-key-here"
+```
+Since the default is `OPENAI_API_KEY`, we need to change two ShinkaEvovle parameters if we want to use OpenRouter, which we describe in the Python API Usage section below.
+
+
 ### Step 4: Verify Installation
 
 ```bash
@@ -153,6 +161,8 @@ shinka_launch \
 
 For more control, you can use the Python API directly:
 
+To use non-OpenAI LLM keys, we need to change the `llm_models` and `embedding_model` parameters in the call to `EvolutionConfig()`. To use OpenRouter, the syntax is `"company/model"`, for example if we want to use GPT-4o-mini from OpenAI we need to pass the parameter in this example. Note that there is only one embedding model while we can use a list of models for the evolutionary call.
+
 ```python
 from shinka.core import EvolutionRunner, EvolutionConfig
 from shinka.database import DatabaseConfig
@@ -176,7 +186,8 @@ db_config = DatabaseConfig(
 evo_config = EvolutionConfig(
     num_generations=10,
     max_parallel_jobs=1,
-    llm_models=["azure-gpt-4.1"],
+    llm_models=["openai/gpt-4o-mini"],
+    embedding_model="openai/text-embedding-3-small",
     init_program_path="examples/circle_packing/initial.py",
     language="python",
     task_sys_msg="You are optimizing circle packing...",
