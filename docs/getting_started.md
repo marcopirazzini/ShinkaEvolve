@@ -142,9 +142,7 @@ uv pip sync pyproject.toml
 
 ### Quick start using OpenRouter API
 
-We added this example specifically for OpenRouter API keys, since the default examples require OpenAI keys. To use non-OpenAI LLM keys, we need to change the `llm_models` and `embedding_model` parameters in the call to `EvolutionConfig()`. To use OpenRouter, the syntax is `"company/model"`, for example if we want to use GPT-4o-mini from OpenAI we need to pass the parameter in this example. Note that there is only one embedding model while we can use a list of models for the evolutionary call.
-
-To run the example, simply run the following command:
+We added this example specifically for OpenRouter API keys, since the default examples require OpenAI keys. To run the example, simply run the following command:
 ```bash
 python examples/sample_problem/run_evolution.py
 ```
