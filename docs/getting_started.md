@@ -140,7 +140,23 @@ uv pip sync pyproject.toml
 
 ## Basic Usage
 
-### Quick Start with CLI
+### Quick start using OpenRouter API
+
+We added this example specifically for OpenRouter API keys, since the default examples require OpenAI keys. To use non-OpenAI LLM keys, we need to change the `llm_models` and `embedding_model` parameters in the call to `EvolutionConfig()`. To use OpenRouter, the syntax is `"company/model"`, for example if we want to use GPT-4o-mini from OpenAI we need to pass the parameter in this example. Note that there is only one embedding model while we can use a list of models for the evolutionary call.
+
+To run the example, simply run the following command:
+```bash
+python examples/sample_problem/run_evolution.py
+```
+
+This will create a `results` folder containing a database with all the evolution data. We can use it to visualize the evolution by running the following command:
+```bash
+shinka_visualize --db examples/sample_problem/results/evolution_db.sqlite --port 8000 --open
+```
+
+Before running the evolution again, make sure to delete the `results` folder. For more information on the visualization interface, see the [WebUI Guide](webui.md).
+
+### Quick Start with CLI - OpenAI API
 
 The easiest way to get started is using the Hydra-based CLI launcher:
 
@@ -160,8 +176,6 @@ shinka_launch \
 ### Python API Usage
 
 For more control, you can use the Python API directly:
-
-To use non-OpenAI LLM keys, we need to change the `llm_models` and `embedding_model` parameters in the call to `EvolutionConfig()`. To use OpenRouter, the syntax is `"company/model"`, for example if we want to use GPT-4o-mini from OpenAI we need to pass the parameter in this example. Note that there is only one embedding model while we can use a list of models for the evolutionary call.
 
 ```python
 from shinka.core import EvolutionRunner, EvolutionConfig

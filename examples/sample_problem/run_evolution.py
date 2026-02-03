@@ -21,8 +21,11 @@ RESULTS_DIR = SCRIPT_DIR / "results"
 
 # Task description for the LLM - Make sure to add expert knowledge here
 TASK_DESCRIPTION = """
-You want to maximize the function below. Since it's so simple, I am not adding a description here.
+You have to solve a very easy task, let's see if you can figure it out.
 """
+# TASK_DESCRIPTION = """
+# You want to find an algorithm to construct a vector with maximum largest entry relative to its euclidean norm.
+# """
 
 
 def main():
@@ -33,7 +36,7 @@ def main():
 
     # Database configuration
     db_config = DatabaseConfig(
-        num_islands=4,  # 4 parallel evolution islands
+        num_islands=4,  # 2 parallel evolution islands
         archive_size=10,
         num_archive_inspirations=3,
         num_top_k_inspirations=2,
@@ -44,9 +47,10 @@ def main():
         init_program_path=str(INIT_PROGRAM),
         results_dir=str(RESULTS_DIR),
         task_sys_msg=TASK_DESCRIPTION,
-        num_generations=10,
+        num_generations=50,
         max_parallel_jobs=2,
         llm_models=["openai/gpt-4o-mini"],
+        # llm_models=["google/gemini-3-flash-preview"],
         embedding_model="openai/text-embedding-3-small",
         patch_types=["diff", "full"],
         patch_type_probs=[0.8, 0.2],
