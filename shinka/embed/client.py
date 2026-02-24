@@ -37,6 +37,12 @@ def get_client_embed(model_name: str) -> Tuple[Any, str]:
         )
     elif provider == "google":
         client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+    elif provider == "openrouter":
+        client = openai.OpenAI(
+            api_key=os.environ["OPENROUTER_API_KEY"],
+            base_url="https://openrouter.ai/api/v1",
+            timeout=600,
+        )
     else:
         raise ValueError(f"Embedding model {model_name} not supported.")
 
@@ -70,6 +76,11 @@ def get_async_client_embed(model_name: str) -> Tuple[Any, str]:
     elif provider == "google":
         # Gemini doesn't have async client yet, will use thread pool in embedding.py
         client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+    elif provider == "openrouter":
+        client = openai.AsyncOpenAI(
+            api_key=os.environ["OPENROUTER_API_KEY"],
+            base_url="https://openrouter.ai/api/v1",
+        )
     else:
         raise ValueError(f"Embedding model {model_name} not supported.")
 

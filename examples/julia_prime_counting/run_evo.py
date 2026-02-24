@@ -13,7 +13,7 @@ job_config = LocalJobConfig(
 
 db_config = DatabaseConfig(
     db_path="evolution_db.sqlite",
-    num_islands=1,
+    num_islands=2,
     archive_size=40,
     elite_selection_ratio=0.3,
     num_archive_inspirations=4,
@@ -48,13 +48,13 @@ evo_config = EvolutionConfig(
     max_patch_attempts=3,
     job_type="local",
     language="julia",
-    llm_models=["gpt-5-mini"],
+    llm_models=["openai/gpt-5-mini"],
     llm_kwargs=dict(
         temperatures=[0.2, 0.6, 0.9],
         reasoning_efforts=["medium"],
         max_tokens=16384,
     ),
-    embedding_model="text-embedding-3-small",
+    embedding_model="openai/text-embedding-3-small",
     code_embed_sim_threshold=0.995,
     init_program_path="initial.jl",
     results_dir="results_julia_prime_counting_async_small",
