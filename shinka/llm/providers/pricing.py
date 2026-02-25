@@ -138,80 +138,34 @@ def calculate_cost(
     return input_cost, output_cost
 
 
-def _parse_openrouter_model(model_name: str) -> Optional[str]:
-    """Extract the base model name from an OpenRouter 'company/model' format.
-
-    Returns the model suffix (after '/') if it's an OpenRouter pattern,
-    otherwise returns None.
-
-    Example: 'openai/gpt-5-mini' -> 'gpt-5-mini'
-    """
-    if "/" in model_name and not model_name.startswith("azure-"):
-        return model_name.split("/", 1)[1]
-    return None
-
-
-def _resolve_model_name(model_name: str) -> Optional[str]:
-    """Resolve a model name to its CSV entry.
-
-    For direct entries, returns the model_name if found.
-    For OpenRouter models (company/model), returns the base model if found in CSV.
-    Returns None if no matching entry exists.
-    """
-    # Direct lookup
-    if model_name in _PRICING_DF.index:
-        return model_name
-    # OpenRouter pattern: check if base model exists
-    base_model = _parse_openrouter_model(model_name)
-    if base_model and base_model in _PRICING_DF.index:
-        return base_model
-    return None
-
-
 def model_exists(model_name: str) -> bool:
-    """Check if a model exists in pricing data.
-
-    Supports both direct model names and OpenRouter 'company/model' format
-    where the base model must exist in the CSV.
-    """
-    return _resolve_model_name(model_name) is not None
+    """Check if a model exists in pricing data."""
+    return model_name in _PRICING_DF.index
 
 
 def is_reasoning_model(model_name: str) -> bool:
     """Check if a model is a reasoning model."""
-    resolved = _resolve_model_name(model_name)
-    if resolved is None:
+    if model_name not in _PRICING_DF.index:
         return False
-    return _PRICING_DF.loc[resolved, "is_reasoning"]
+    return _PRICING_DF.loc[model_name, "is_reasoning"]
 
 
 def get_provider(model_name: str) -> Optional[str]:
-    """Get the provider for a given model.
-
-    For OpenRouter models (company/model format), returns 'openrouter'
-    if the base model exists in CSV, regardless of the CSV's provider field.
-    """
-    # Check if it's an OpenRouter model with valid base
-    base_model = _parse_openrouter_model(model_name)
-    if base_model and base_model in _PRICING_DF.index:
-        return "openrouter"
-    # Direct lookup
-    if model_name in _PRICING_DF.index:
-        return _PRICING_DF.loc[model_name, "provider"]
-    return None
+    """Get the provider for a given model."""
+    if model_name not in _PRICING_DF.index:
+        return None
+    return _PRICING_DF.loc[model_name, "provider"]
 
 
 def has_fixed_temperature(model_name: str) -> bool:
     """Check if a model requires temperature fixed to 1.0."""
-    resolved = _resolve_model_name(model_name)
-    if resolved is None:
+    if model_name not in _PRICING_DF.index:
         return False
-    return _PRICING_DF.loc[resolved, "think_temp_fixed"]
+    return _PRICING_DF.loc[model_name, "think_temp_fixed"]
 
 
 def requires_reasoning(model_name: str) -> bool:
     """Check if a model requires reasoning effort to be set."""
-    resolved = _resolve_model_name(model_name)
-    if resolved is None:
+    if model_name not in _PRICING_DF.index:
         return False
-    return _PRICING_DF.loc[resolved, "requires_reasoning"]
+    return _PRICING_DF.loc[model_name, "requires_reasoning"]
