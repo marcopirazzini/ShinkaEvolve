@@ -87,14 +87,6 @@ def get_client_llm(
                 client,
                 mode=instructor.Mode.GEMINI_JSON,
             )
-    elif provider == "fugu":
-        client = openai.OpenAI(
-            api_key=os.environ["FUGU_API_KEY"],
-            base_url=os.environ["FUGU_BASE_URL"],
-            timeout=TIMEOUT,
-        )
-        if structured_output:
-            raise ValueError("Fugu does not support structured output.")
     elif provider == "openrouter":
         client = openai.OpenAI(
             api_key=os.environ["OPENROUTER_API_KEY"],
@@ -175,14 +167,6 @@ def get_async_client_llm(
         client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
         if structured_output:
             raise ValueError("Gemini does not support structured output.")
-    elif provider == "fugu":
-        client = openai.AsyncOpenAI(
-            api_key=os.environ["FUGU_API_KEY"],
-            base_url=os.environ["FUGU_BASE_URL"],
-            timeout=60000,
-        )
-        if structured_output:
-            raise ValueError("Fugu does not support structured output.")
     elif provider == "openrouter":
         client = openai.AsyncOpenAI(
             api_key=os.environ["OPENROUTER_API_KEY"],

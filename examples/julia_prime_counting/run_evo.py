@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-import asyncio
-
-from shinka.core import AsyncEvolutionRunner, EvolutionConfig
+from shinka.core import ShinkaEvolveRunner, EvolutionConfig
 from shinka.database import DatabaseConfig
 from shinka.launch import LocalJobConfig
 
@@ -13,7 +11,7 @@ job_config = LocalJobConfig(
 
 db_config = DatabaseConfig(
     db_path="evolution_db.sqlite",
-    num_islands=2,
+    num_islands=1,
     archive_size=40,
     elite_selection_ratio=0.3,
     num_archive_inspirations=4,
@@ -43,18 +41,17 @@ evo_config = EvolutionConfig(
     patch_types=["diff", "full"],
     patch_type_probs=[0.7, 0.3],
     num_generations=24,
-    max_parallel_jobs=1,
     max_patch_resamples=2,
     max_patch_attempts=3,
     job_type="local",
     language="julia",
-    llm_models=["openai/gpt-5-mini"],
+    llm_models=["gpt-5-mini"],
     llm_kwargs=dict(
         temperatures=[0.2, 0.6, 0.9],
         reasoning_efforts=["medium"],
         max_tokens=16384,
     ),
-    embedding_model="openai/text-embedding-3-small",
+    embedding_model="text-embedding-3-small",
     code_embed_sim_threshold=0.995,
     init_program_path="initial.jl",
     results_dir="results_julia_prime_counting_async_small",
@@ -67,8 +64,8 @@ SMALL_MAX_PROPOSAL_JOBS = 2
 SMALL_MAX_DB_WORKERS = 1
 
 
-async def main():
-    runner = AsyncEvolutionRunner(
+def main():
+    runner = ShinkaEvolveRunner(
         evo_config=evo_config,
         job_config=job_config,
         db_config=db_config,
@@ -77,8 +74,8 @@ async def main():
         max_db_workers=SMALL_MAX_DB_WORKERS,
         verbose=True,
     )
-    await runner.run()
+    runner.run()
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
