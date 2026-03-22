@@ -105,6 +105,18 @@ shinka_launch --help
 python -c "from shinka.core import ShinkaEvolveRunner; print('Installation successful!')"
 ```
 
+### Step 5: Optional Agent Skills Install
+
+If you want Claude Code or Codex to use the bundled Shinka skills directly from this repo, install them with the upstream `skills` CLI:
+
+```bash
+npx skills add SakanaAI/ShinkaEvolve --skill '*' -g -a claude-code -a codex -y
+```
+
+This installs the repo skills without any manual file copying.
+
+For the full agent workflow and per-skill walkthroughs, see [Agentic Usage Guide](agentic_usage.md).
+
 ### Advanced uv Features (Optional)
 
 If you're using uv, you can take advantage of additional features:
@@ -151,8 +163,8 @@ Before running the evolution again, make sure to delete the `results` folder. Fo
 The easiest way to get started is using the Hydra-based CLI launcher:
 
 ```bash
-# Run circle packing example with default settings
-shinka_launch variant=circle_packing_example
+# Run circle packing with the shared default baseline
+shinka_launch
 
 # Run with custom parameters
 shinka_launch \
@@ -161,6 +173,16 @@ shinka_launch \
     evolution=small_budget \
     cluster=local \
     evo_config.num_generations=5
+```
+
+The original shorthand group syntax still works (`task=...`, `database=...`, `evolution=...`, `cluster=...`, `variant=...`). Built-in presets ship inside the package under `shinka/configs/`.
+
+To add your own Hydra presets from a PyPI install without cloning the repo, create your own config directory and pass `--config-dir`:
+
+```bash
+mkdir -p ~/my-shinka-configs/variant
+$EDITOR ~/my-shinka-configs/variant/my_variant.yaml
+shinka_launch --config-dir ~/my-shinka-configs variant=my_variant
 ```
 
 ### Agent-Friendly CLI (`shinka_run`)
@@ -205,21 +227,21 @@ from shinka.launch import LocalJobConfig
 # Configure the job execution environment
 job_config = LocalJobConfig(
     eval_program_path="examples/circle_packing/evaluate.py",
-    conda_env="my_special_env",  # Optional: run in specific conda environment
+    activate_script=".venv/bin/activate",  # Optional: source uv/venv env for each job
 )
 
 # Configure the evolution database
 db_config = DatabaseConfig(
-    archive_size=20,
-    num_archive_inspirations=4,
+    archive_size=40,
+    num_archive_inspirations=1,
     num_islands=2,
     migration_interval=10,
 )
 
 # Configure the evolution parameters
 evo_config = EvolutionConfig(
-    num_generations=10,
-    llm_models=["azure-gpt-4.1"],
+    num_generations=50,
+    llm_models=["gpt-5-mini", "gemini-3-flash-preview"],
     init_program_path="examples/circle_packing/initial.py",
     language="python",
     task_sys_msg="You are optimizing circle packing...",
@@ -266,7 +288,7 @@ examples/circle_packing/
 
 ```bash
 # Using CLI launcher (recommended)
-shinka_launch variant=circle_packing_example
+shinka_launch
 
 # Or with custom settings
 shinka_launch \
@@ -384,10 +406,11 @@ The `run_shinka_eval` function returns three values:
 
 | Example | Description | Use Case |
 |---------|-------------|----------|
-| **Circle Packing** | Optimize circle arrangements | Geometric optimization |
-| **Agent Design** | Design AI agent scaffolds | Algorithm architecture |
-| **ALE-Bench** | Optimize competitive programming solutions | Code optimization |
-| **Novelty Generator** | Generate diverse creative outputs | Open-ended exploration |
+| **[Circle Packing](https://github.com/SakanaAI/ShinkaEvolve/tree/main/examples/circle_packing)** | Pack 26 circles in a unit square; maximize sum of radii | Geometric optimization / continuous search |
+| **[2048](https://github.com/SakanaAI/ShinkaEvolve/tree/main/examples/game_2048)** | Evolve a policy to play 2048 under action/time constraints | Game-playing / heuristic optimization |
+| **[Julia Prime Counting](https://github.com/SakanaAI/ShinkaEvolve/tree/main/examples/julia_prime_counting)** | Optimize a Julia solution for repeated prime-count queries (\(\pi(n)\)) | Algorithmic optimization (correctness + runtime) |
+| **[Novelty Generator](https://github.com/SakanaAI/ShinkaEvolve/tree/main/examples/novelty_generator)** | Generate diverse outputs scored by LLM-as-a-judge novelty metrics | Open-ended exploration / creative generation |
+| **[Shinka Tutorial (Notebook)](https://github.com/SakanaAI/ShinkaEvolve/blob/main/examples/shinka_tutorial.ipynb)** | Guided walkthrough of setup + running/inspecting Circle Packing and Novelty Generator | Interactive onboarding / WebUI + configs |
 
 
 
@@ -410,7 +433,7 @@ When you specify an existing `results_dir` that contains a database, Shinka will
 ```bash
 # Resume an existing run and extend to 50 generations
 shinka_launch \
-    variant=circle_packing_example \
+    variant=default \
     evo_config.results_dir=results_20250101_120000 \
     evo_config.num_generations=50
 
@@ -474,7 +497,17 @@ job_config = LocalJobConfig(
 # Uses the currently active Python environment
 ```
 
-#### Option 2: Use Specific Conda Environment
+#### Option 2: Source a Specific Python Environment Script
+```python
+job_config = LocalJobConfig(
+    eval_program_path="evaluate.py",
+    activate_script=".venv/bin/activate"  # Runs after `source .venv/bin/activate`
+)
+```
+
+Use this for uv/venv-style workflows where the job should bootstrap from a sourceable activation script.
+
+#### Option 3: Use Specific Conda Environment
 ```python
 job_config = LocalJobConfig(
     eval_program_path="evaluate.py",
@@ -486,13 +519,14 @@ This is particularly useful when:
 - Different experiments require different dependency versions
 - You want to isolate evaluation environments from your main development environment
 - Testing compatibility across multiple Python/package versions
+- `conda_env` and `activate_script` should not be set together
 
 ### Creating Custom Tasks
 
-1. **Define the Problem**: Create task config in `configs/task/my_task.yaml`
+1. **Define the Problem**: Create task config in `shinka/configs/task/my_task.yaml`
 2. **Initial Solution**: Write `initial.py` with `EVOLVE-BLOCK` markers
 3. **Evaluation Script**: Create `evaluate.py` with validation logic
-4. **Variant Config**: Combine settings in `configs/variant/my_variant.yaml`
+4. **Variant Config**: Combine settings in `shinka/configs/variant/my_variant.yaml`
 
 For detailed configuration options, parameter explanations, and advanced patterns, see the [Configuration Guide](configuration.md).
 

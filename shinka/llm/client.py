@@ -3,13 +3,11 @@ import os
 import anthropic
 import openai
 import instructor
-from pathlib import Path
-from dotenv import load_dotenv
 from google import genai
+from shinka.env import load_shinka_dotenv
 from .providers.model_resolver import resolve_model_backend
 
-env_path = Path(__file__).parent.parent.parent / ".env"
-load_dotenv(dotenv_path=env_path, override=True)
+load_shinka_dotenv()
 
 TIMEOUT = 600
 
@@ -143,7 +141,7 @@ def get_async_client_llm(
                 client, mode=instructor.mode.Mode.ANTHROPIC_JSON
             )
     elif provider == "openai":
-        client = openai.AsyncOpenAI()
+        client = openai.AsyncOpenAI(timeout=TIMEOUT)
         if structured_output:
             client = instructor.from_openai(client, mode=instructor.Mode.TOOLS_STRICT)
     elif provider == "azure_openai":
