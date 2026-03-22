@@ -95,14 +95,6 @@ OPENROUTER_API_KEY=sk-or-v1-...             # Optional (for openrouter/* models)
 LOCAL_OPENAI_API_KEY=local                  # Optional (for local/*@http(s)://... models)
 ```
 
-To use OpenRouter keys, set the following variable
-```bash
-# .env file
-OPENROUTER_API_KEY="your-openrouter-key-here"
-```
-Since the default is `OPENAI_API_KEY`, we need to change two ShinkaEvovle parameters if we want to use OpenRouter, which we describe in the Python API Usage section below.
-
-
 ### Step 4: Verify Installation
 
 ```bash
