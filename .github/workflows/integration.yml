@@ -42,6 +42,8 @@ jobs:
         run: uv sync --dev --extra wandb
 
       - name: Run secret-backed integration tests
+        # Forks have no repository secrets; skip rather than fail.
+        if: github.repository == 'SakanaAI/ShinkaEvolve' || github.event_name == 'workflow_dispatch'
         run: |
           set +e
           uv run pytest -q -m "requires_secrets"
